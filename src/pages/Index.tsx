@@ -260,29 +260,77 @@ const Index = () => {
       case "Фиксация деятельности":
         return (
           <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold">Журнал действий</h3>
-              <Button size="sm">
-                <Icon name="Plus" size={16} className="mr-2" />
-                Добавить запись
-              </Button>
-            </div>
             <div className="space-y-4">
-              {activityLogs.map((log, index) => (
-                <div key={index} className="border rounded-lg p-4 space-y-2">
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center space-x-2">
-                      <Badge variant="outline">{log.time}</Badge>
-                      <span className="font-medium">{log.admin}</span>
+              <h3 className="text-lg font-semibold">
+                Инструкция по фиксации деятельности
+              </h3>
+              <div className="space-y-3">
+                <h4 className="font-medium">1. Обязательные записи</h4>
+                <p className="text-sm text-gray-600">
+                  • Все действия администратора должны быть зафиксированы в
+                  журнале\n• Запись должна содержать время, действие и детали\n•
+                  Обязательно указывать ID игроков при взаимодействии с ними
+                </p>
+
+                <h4 className="font-medium">2. Формат записи</h4>
+                <p className="text-sm text-gray-600">
+                  • Время в формате ЧЧ:ММ:СС\n• Краткое описание действия\n•
+                  Подробные детали (участники, причины, результаты)\n•
+                  Прикрепление скриншотов при необходимости
+                </p>
+
+                <h4 className="font-medium">3. Типы фиксируемых действий</h4>
+                <p className="text-sm text-gray-600">
+                  • Создание и завершение ивентов\n• Выдача наказаний игрокам\n•
+                  Выдача наград и призов\n• Решение конфликтных ситуаций\n•
+                  Технические проблемы и их решения
+                </p>
+
+                <h4 className="font-medium">4. Требования к качеству</h4>
+                <p className="text-sm text-gray-600">
+                  • Записи должны быть понятными для других администраторов\n•
+                  Не допускается использование сокращений без объяснения\n• Все
+                  действия должны соответствовать правилам сервера\n• Личные
+                  комментарии выделяются отдельно
+                </p>
+
+                <h4 className="font-medium">5. Проверка и контроль</h4>
+                <p className="text-sm text-gray-600">
+                  • Записи проверяются главным администратором еженедельно\n•
+                  Неполные или некорректные записи требуют исправления\n• За
+                  систематическое нарушение ведения журнала - выговор\n• Лучшие
+                  практики поощряются руководством
+                </p>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Журнал действий</h3>
+                <Button size="sm">
+                  <Icon name="Plus" size={16} className="mr-2" />
+                  Добавить запись
+                </Button>
+              </div>
+              <div className="space-y-4">
+                {activityLogs.map((log, index) => (
+                  <div key={index} className="border rounded-lg p-4 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="outline">{log.time}</Badge>
+                        <span className="font-medium">{log.admin}</span>
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        <Icon name="MoreHorizontal" size={14} />
+                      </Button>
                     </div>
-                    <Button variant="ghost" size="sm">
-                      <Icon name="MoreHorizontal" size={14} />
-                    </Button>
+                    <p className="text-sm font-medium">{log.action}</p>
+                    <p className="text-xs text-gray-600">{log.details}</p>
                   </div>
-                  <p className="text-sm font-medium">{log.action}</p>
-                  <p className="text-xs text-gray-600">{log.details}</p>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         );
