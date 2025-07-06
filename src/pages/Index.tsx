@@ -116,7 +116,7 @@ const Index = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 text-sm">Всего ивентов</p>
+                  <p className="text-blue-100 text-sm">Всего ГМП</p>
                   <p className="text-3xl font-bold">{eventStats.totalEvents}</p>
                 </div>
                 <Icon name="Calendar" size={40} className="text-blue-200" />
