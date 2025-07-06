@@ -41,6 +41,22 @@ const Index = () => {
     participants: "",
     rewards: "",
   });
+  const [newTeamMember, setNewTeamMember] = useState({ name: "", role: "" });
+  const [newActivity, setNewActivity] = useState({ action: "", details: "" });
+  const [reportSettings, setReportSettings] = useState({
+    period: "",
+    type: "",
+  });
+  const [punishmentForm, setPunishmentForm] = useState({
+    playerId: "",
+    type: "",
+    reason: "",
+    duration: "",
+  });
+  const [accessSettings, setAccessSettings] = useState({
+    viewLogs: "admins",
+    editLogs: "senior",
+  });
 
   const eventStats = {
     totalEvents: 47,
@@ -65,7 +81,7 @@ const Index = () => {
     {
       title: "Фиксация деятельности",
       icon: "FileText",
-      description: "Логи и записи действий",
+      description: "Инструкция по ведению логов",
       color: "bg-purple-500",
     },
     {
@@ -81,9 +97,9 @@ const Index = () => {
       color: "bg-red-500",
     },
     {
-      title: "Статистика",
-      icon: "BarChart3",
-      description: "Аналитика и метрики",
+      title: "Журнал действий",
+      icon: "ScrollText",
+      description: "Просмотр логов активности",
       color: "bg-indigo-500",
     },
     {
@@ -137,7 +153,12 @@ const Index = () => {
       status: "Отошёл",
       events: 12,
     },
-    { name: "Дмитрий Козлов", role: "Модератор", status: "Оффлайн", events: 8 },
+    {
+      name: "Дмитрий Козлов",
+      role: "Модератор",
+      status: "Оффлайн",
+      events: 8,
+    },
   ];
 
   const activityLogs = [
@@ -168,10 +189,67 @@ const Index = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">Команда администраторов</h3>
-              <Button size="sm">
-                <Icon name="UserPlus" size={16} className="mr-2" />
-                Добавить админа
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button size="sm">
+                    <Icon name="UserPlus" size={16} className="mr-2" />
+                    Добавить админа
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Добавить нового администратора</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="memberName">Имя</Label>
+                      <Input
+                        id="memberName"
+                        value={newTeamMember.name}
+                        onChange={(e) =>
+                          setNewTeamMember({
+                            ...newTeamMember,
+                            name: e.target.value,
+                          })
+                        }
+                        placeholder="Введите имя"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="memberRole">Роль</Label>
+                      <Select
+                        value={newTeamMember.role}
+                        onValueChange={(value) =>
+                          setNewTeamMember({ ...newTeamMember, role: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Выберите роль" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="admin">Администратор</SelectItem>
+                          <SelectItem value="moderator">Модератор</SelectItem>
+                          <SelectItem value="helper">Помощник</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex justify-end space-x-2">
+                      <Button variant="outline">Отмена</Button>
+                      <Button
+                        onClick={() => {
+                          console.log(
+                            "Добавлен новый член команды:",
+                            newTeamMember,
+                          );
+                          setNewTeamMember({ name: "", role: "" });
+                        }}
+                      >
+                        Добавить
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
             <Table>
               <TableHeader>
@@ -203,7 +281,16 @@ const Index = () => {
                     </TableCell>
                     <TableCell>{member.events}</TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="sm">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setNewTeamMember({
+                            name: member.name,
+                            role: member.role,
+                          });
+                        }}
+                      >
                         <Icon name="Edit" size={14} />
                       </Button>
                     </TableCell>
@@ -303,35 +390,6 @@ const Index = () => {
                 </p>
               </div>
             </div>
-
-            <Separator />
-
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Журнал действий</h3>
-                <Button size="sm">
-                  <Icon name="Plus" size={16} className="mr-2" />
-                  Добавить запись
-                </Button>
-              </div>
-              <div className="space-y-4">
-                {activityLogs.map((log, index) => (
-                  <div key={index} className="border rounded-lg p-4 space-y-2">
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-center space-x-2">
-                        <Badge variant="outline">{log.time}</Badge>
-                        <span className="font-medium">{log.admin}</span>
-                      </div>
-                      <Button variant="ghost" size="sm">
-                        <Icon name="MoreHorizontal" size={14} />
-                      </Button>
-                    </div>
-                    <p className="text-sm font-medium">{log.action}</p>
-                    <p className="text-xs text-gray-600">{log.details}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         );
       case "Еженедельная отчетность":
@@ -415,10 +473,117 @@ const Index = () => {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <h4 className="font-medium">Типы наказаний</h4>
-                <Button size="sm" variant="destructive">
-                  <Icon name="UserX" size={16} className="mr-2" />
-                  Выдать наказание
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="destructive">
+                      <Icon name="UserX" size={16} className="mr-2" />
+                      Выдать наказание
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Выдать наказание</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="playerId">ID игрока</Label>
+                        <Input
+                          id="playerId"
+                          value={punishmentForm.playerId}
+                          onChange={(e) =>
+                            setPunishmentForm({
+                              ...punishmentForm,
+                              playerId: e.target.value,
+                            })
+                          }
+                          placeholder="Введите ID игрока"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="punishmentType">Тип наказания</Label>
+                        <Select
+                          value={punishmentForm.type}
+                          onValueChange={(value) =>
+                            setPunishmentForm({
+                              ...punishmentForm,
+                              type: value,
+                            })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Выберите тип" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="warning">
+                              Предупреждение
+                            </SelectItem>
+                            <SelectItem value="kick">Кик</SelectItem>
+                            <SelectItem value="tempban">
+                              Временный бан
+                            </SelectItem>
+                            <SelectItem value="permban">
+                              Постоянный бан
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="reason">Причина</Label>
+                        <Textarea
+                          id="reason"
+                          value={punishmentForm.reason}
+                          onChange={(e) =>
+                            setPunishmentForm({
+                              ...punishmentForm,
+                              reason: e.target.value,
+                            })
+                          }
+                          placeholder="Укажите причину наказания"
+                        />
+                      </div>
+                      {punishmentForm.type === "tempban" && (
+                        <div className="space-y-2">
+                          <Label htmlFor="duration">Длительность</Label>
+                          <Select
+                            value={punishmentForm.duration}
+                            onValueChange={(value) =>
+                              setPunishmentForm({
+                                ...punishmentForm,
+                                duration: value,
+                              })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Выберите время" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="1hour">1 час</SelectItem>
+                              <SelectItem value="24hours">24 часа</SelectItem>
+                              <SelectItem value="7days">7 дней</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                      <div className="flex justify-end space-x-2">
+                        <Button variant="outline">Отмена</Button>
+                        <Button
+                          variant="destructive"
+                          onClick={() => {
+                            console.log("Наказание выдано:", punishmentForm);
+                            setPunishmentForm({
+                              playerId: "",
+                              type: "",
+                              reason: "",
+                              duration: "",
+                            });
+                          }}
+                        >
+                          Выдать наказание
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="border rounded-lg p-3">
@@ -443,6 +608,246 @@ const Index = () => {
                     За серьёзные нарушения
                   </p>
                 </div>
+              </div>
+            </div>
+          </div>
+        );
+      case "Журнал действий":
+        return (
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">
+                Инструкция по фиксации деятельности
+              </h3>
+              <div className="space-y-3">
+                <h4 className="font-medium">1. Обязательные записи</h4>
+                <p className="text-sm text-gray-600">
+                  • Все действия администратора должны быть зафиксированы в
+                  журнале\n• Запись должна содержать время, действие и детали\n•
+                  Обязательно указывать ID игроков при взаимодействии с ними
+                </p>
+
+                <h4 className="font-medium">2. Формат записи</h4>
+                <p className="text-sm text-gray-600">
+                  • Время в формате ЧЧ:ММ:СС\n• Краткое описание действия\n•
+                  Подробные детали (участники, причины, результаты)\n•
+                  Прикрепление скриншотов при необходимости
+                </p>
+
+                <h4 className="font-medium">3. Типы фиксируемых действий</h4>
+                <p className="text-sm text-gray-600">
+                  • Создание и завершение ивентов\n• Выдача наказаний игрокам\n•
+                  Выдача наград и призов\n• Решение конфликтных ситуаций\n•
+                  Технические проблемы и их решения
+                </p>
+
+                <h4 className="font-medium">4. Требования к качеству</h4>
+                <p className="text-sm text-gray-600">
+                  • Записи должны быть понятными для других администраторов\n•
+                  Не допускается использование сокращений без объяснения\n• Все
+                  действия должны соответствовать правилам сервера\n• Личные
+                  комментарии выделяются отдельно
+                </p>
+
+                <h4 className="font-medium">5. Проверка и контроль</h4>
+                <p className="text-sm text-gray-600">
+                  • Записи проверяются главным администратором еженедельно\n•
+                  Неполные или некорректные записи требуют исправления\n• За
+                  систематическое нарушение ведения журнала - выговор\n• Лучшие
+                  практики поощряются руководством
+                </p>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Журнал действий</h3>
+                <div className="flex space-x-2">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button size="sm">
+                        <Icon name="Plus" size={16} className="mr-2" />
+                        Добавить запись
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Добавить запись в журнал</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="activityAction">Действие</Label>
+                          <Input
+                            id="activityAction"
+                            value={newActivity.action}
+                            onChange={(e) =>
+                              setNewActivity({
+                                ...newActivity,
+                                action: e.target.value,
+                              })
+                            }
+                            placeholder="Описание действия"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="activityDetails">Детали</Label>
+                          <Textarea
+                            id="activityDetails"
+                            value={newActivity.details}
+                            onChange={(e) =>
+                              setNewActivity({
+                                ...newActivity,
+                                details: e.target.value,
+                              })
+                            }
+                            placeholder="Подробная информация"
+                          />
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <Button variant="outline">Отмена</Button>
+                          <Button
+                            onClick={() => {
+                              console.log("Добавлена запись:", newActivity);
+                              setNewActivity({ action: "", details: "" });
+                            }}
+                          >
+                            Добавить
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button size="sm" variant="outline">
+                        <Icon name="Settings" size={16} className="mr-2" />
+                        Настройки доступа
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Настройки доступа к журналу</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label>Кто может просматривать журнал</Label>
+                          <Select
+                            value={accessSettings.viewLogs}
+                            onValueChange={(value) =>
+                              setAccessSettings({
+                                ...accessSettings,
+                                viewLogs: value,
+                              })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">
+                                Все администраторы
+                              </SelectItem>
+                              <SelectItem value="admins">
+                                Только администраторы
+                              </SelectItem>
+                              <SelectItem value="senior">
+                                Только старшие администраторы
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Кто может редактировать журнал</Label>
+                          <Select
+                            value={accessSettings.editLogs}
+                            onValueChange={(value) =>
+                              setAccessSettings({
+                                ...accessSettings,
+                                editLogs: value,
+                              })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="senior">
+                                Только старшие администраторы
+                              </SelectItem>
+                              <SelectItem value="main">
+                                Только главный администратор
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <Button variant="outline">Отмена</Button>
+                          <Button
+                            onClick={() => {
+                              console.log(
+                                "Настройки доступа сохранены:",
+                                accessSettings,
+                              );
+                            }}
+                          >
+                            Сохранить
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
+              <div className="space-y-4">
+                {activityLogs.map((log, index) => (
+                  <div key={index} className="border rounded-lg p-4 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="outline">{log.time}</Badge>
+                        <span className="font-medium">{log.admin}</span>
+                      </div>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <Icon name="MoreHorizontal" size={14} />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Действия с записью</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-2">
+                            <Button
+                              variant="outline"
+                              className="w-full justify-start"
+                            >
+                              <Icon name="Edit" size={16} className="mr-2" />
+                              Редактировать
+                            </Button>
+                            <Button
+                              variant="outline"
+                              className="w-full justify-start"
+                            >
+                              <Icon name="Copy" size={16} className="mr-2" />
+                              Копировать
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              className="w-full justify-start"
+                            >
+                              <Icon name="Trash2" size={16} className="mr-2" />
+                              Удалить
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                    <p className="text-sm font-medium">{log.action}</p>
+                    <p className="text-xs text-gray-600">{log.details}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -651,21 +1056,79 @@ const Index = () => {
                     <Label htmlFor="notifications">
                       Уведомления о новых ивентах
                     </Label>
-                    <Button variant="outline" size="sm">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        console.log("Переключение уведомлений");
+                      }}
+                    >
                       Включено
                     </Button>
                   </div>
                   <div className="flex items-center justify-between">
                     <Label htmlFor="reports">Напоминания об отчётах</Label>
-                    <Button variant="outline" size="sm">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        console.log("Переключение уведомлений");
+                      }}
+                    >
                       Включено
                     </Button>
                   </div>
                   <div className="flex items-center justify-between">
                     <Label htmlFor="discord">Интеграция с Discord</Label>
-                    <Button variant="outline" size="sm">
-                      Настроить
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          Настроить
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Настройки Discord</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="webhook">Webhook URL</Label>
+                            <Input
+                              id="webhook"
+                              placeholder="https://discord.com/api/webhooks/..."
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="channel">
+                              Канал для уведомлений
+                            </Label>
+                            <Select>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Выберите канал" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="admin-logs">
+                                  admin-logs
+                                </SelectItem>
+                                <SelectItem value="events">events</SelectItem>
+                                <SelectItem value="general">general</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="flex justify-end space-x-2">
+                            <Button variant="outline">Отмена</Button>
+                            <Button
+                              onClick={() => {
+                                console.log("Discord настроен");
+                                alert("Интеграция с Discord настроена!");
+                              }}
+                            >
+                              Сохранить
+                            </Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </CardContent>
               </Card>
@@ -743,8 +1206,30 @@ const Index = () => {
         </div>
       </div>
       <div className="flex justify-end space-x-2">
-        <Button variant="outline">Сохранить как шаблон</Button>
-        <Button>Создать ивент</Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            console.log("Шаблон сохранён:", eventForm);
+            alert("Шаблон ивента сохранён!");
+          }}
+        >
+          Сохранить как шаблон
+        </Button>
+        <Button
+          onClick={() => {
+            console.log("Ивент создан:", eventForm);
+            alert("Ивент успешно создан!");
+            setEventForm({
+              name: "",
+              description: "",
+              type: "",
+              participants: "",
+              rewards: "",
+            });
+          }}
+        >
+          Создать ивент
+        </Button>
       </div>
     </div>
   );
@@ -957,7 +1442,15 @@ const Index = () => {
                   <div className="mt-4 space-y-4">
                     <div className="space-y-2">
                       <Label>Период отчёта</Label>
-                      <Select>
+                      <Select
+                        value={reportSettings.period}
+                        onValueChange={(value) =>
+                          setReportSettings({
+                            ...reportSettings,
+                            period: value,
+                          })
+                        }
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Выберите период" />
                         </SelectTrigger>
@@ -970,7 +1463,12 @@ const Index = () => {
                     </div>
                     <div className="space-y-2">
                       <Label>Тип отчёта</Label>
-                      <Select>
+                      <Select
+                        value={reportSettings.type}
+                        onValueChange={(value) =>
+                          setReportSettings({ ...reportSettings, type: value })
+                        }
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Выберите тип" />
                         </SelectTrigger>
@@ -984,8 +1482,22 @@ const Index = () => {
                       </Select>
                     </div>
                     <div className="flex justify-end space-x-2">
-                      <Button variant="outline">Предпросмотр</Button>
-                      <Button>Сгенерировать</Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          console.log("Предпросмотр отчёта:", reportSettings);
+                        }}
+                      >
+                        Предпросмотр
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          console.log("Генерация отчёта:", reportSettings);
+                          alert("Отчёт сгенерирован и отправлен на почту!");
+                        }}
+                      >
+                        Сгенерировать
+                      </Button>
                     </div>
                   </div>
                 </DialogContent>
