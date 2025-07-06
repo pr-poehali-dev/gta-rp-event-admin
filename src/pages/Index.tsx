@@ -2,9 +2,46 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Separator } from "@/components/ui/separator";
 import Icon from "@/components/ui/icon";
+import { useState } from "react";
 
 const Index = () => {
+  const [selectedSection, setSelectedSection] = useState<string | null>(null);
+  const [eventForm, setEventForm] = useState({
+    name: "",
+    description: "",
+    type: "",
+    participants: "",
+    rewards: "",
+  });
+
   const eventStats = {
     totalEvents: 47,
     activeEvents: 8,
@@ -80,6 +117,589 @@ const Index = () => {
       time: "1 час назад",
     },
   ];
+
+  const teamMembers = [
+    {
+      name: "Александр Иванов",
+      role: "Главный администратор",
+      status: "Онлайн",
+      events: 23,
+    },
+    {
+      name: "Максим Петров",
+      role: "Ивент-мастер",
+      status: "Онлайн",
+      events: 18,
+    },
+    {
+      name: "Елена Сидорова",
+      role: "Помощник админа",
+      status: "Отошёл",
+      events: 12,
+    },
+    { name: "Дмитрий Козлов", role: "Модератор", status: "Оффлайн", events: 8 },
+  ];
+
+  const activityLogs = [
+    {
+      time: "21:30:15",
+      admin: "AdminName",
+      action: 'Создан ивент "Гонки на выживание"',
+      details: "Участники: 15 чел. Награды: 50000$",
+    },
+    {
+      time: "21:15:22",
+      admin: "AdminName2",
+      action: "Выдано наказание игроку ID:4521",
+      details: "Причина: Нарушение правил ивента. Наказание: Кик",
+    },
+    {
+      time: "20:45:33",
+      admin: "AdminName3",
+      action: 'Завершён ивент "Захват территории"',
+      details: 'Победитель: Команда "Альфа". Награды розданы',
+    },
+  ];
+
+  const renderSectionContent = (section: string) => {
+    switch (section) {
+      case "Состав":
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Команда администраторов</h3>
+              <Button size="sm">
+                <Icon name="UserPlus" size={16} className="mr-2" />
+                Добавить админа
+              </Button>
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Имя</TableHead>
+                  <TableHead>Роль</TableHead>
+                  <TableHead>Статус</TableHead>
+                  <TableHead>Ивенты</TableHead>
+                  <TableHead>Действия</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {teamMembers.map((member, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-medium">{member.name}</TableCell>
+                    <TableCell>{member.role}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          member.status === "Онлайн"
+                            ? "default"
+                            : member.status === "Отошёл"
+                              ? "secondary"
+                              : "destructive"
+                        }
+                      >
+                        {member.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{member.events}</TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="sm">
+                        <Icon name="Edit" size={14} />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        );
+      case "Правила мероприятий":
+        return (
+          <Tabs defaultValue="general" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="general">Общие правила</TabsTrigger>
+              <TabsTrigger value="conduct">Поведение</TabsTrigger>
+              <TabsTrigger value="rewards">Награды</TabsTrigger>
+            </TabsList>
+            <TabsContent value="general" className="space-y-4">
+              <div className="space-y-3">
+                <h4 className="font-medium">1. Общие положения</h4>
+                <p className="text-sm text-gray-600">
+                  • Все участники должны соблюдать правила сервера\n• Запрещено
+                  использование читов и багов\n• Администраторы имеют право
+                  изменять правила ивента
+                </p>
+                <h4 className="font-medium">2. Участие в ивентах</h4>
+                <p className="text-sm text-gray-600">
+                  • Регистрация обязательна\n• Опоздание более 10 минут =
+                  исключение\n• Один игрок = один аккаунт
+                </p>
+              </div>
+            </TabsContent>
+            <TabsContent value="conduct" className="space-y-4">
+              <div className="space-y-3">
+                <h4 className="font-medium">Правила поведения</h4>
+                <p className="text-sm text-gray-600">
+                  • Уважительное отношение к участникам\n• Запрет на оскорбления
+                  и токсичность\n• Следование указаниям администраторов
+                </p>
+              </div>
+            </TabsContent>
+            <TabsContent value="rewards" className="space-y-4">
+              <div className="space-y-3">
+                <h4 className="font-medium">Система наград</h4>
+                <p className="text-sm text-gray-600">
+                  • 1 место: 100,000$ + уникальный скин\n• 2 место: 50,000$ +
+                  транспорт\n• 3 место: 25,000$ + оружие\n• Участие: 5,000$ +
+                  опыт
+                </p>
+              </div>
+            </TabsContent>
+          </Tabs>
+        );
+      case "Фиксация деятельности":
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Журнал действий</h3>
+              <Button size="sm">
+                <Icon name="Plus" size={16} className="mr-2" />
+                Добавить запись
+              </Button>
+            </div>
+            <div className="space-y-4">
+              {activityLogs.map((log, index) => (
+                <div key={index} className="border rounded-lg p-4 space-y-2">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center space-x-2">
+                      <Badge variant="outline">{log.time}</Badge>
+                      <span className="font-medium">{log.admin}</span>
+                    </div>
+                    <Button variant="ghost" size="sm">
+                      <Icon name="MoreHorizontal" size={14} />
+                    </Button>
+                  </div>
+                  <p className="text-sm font-medium">{log.action}</p>
+                  <p className="text-xs text-gray-600">{log.details}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      case "Еженедельная отчетность":
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-2xl font-bold text-blue-600">15</div>
+                  <div className="text-sm text-gray-600">Ивенты за неделю</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-2xl font-bold text-green-600">324</div>
+                  <div className="text-sm text-gray-600">Участников</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-2xl font-bold text-purple-600">89%</div>
+                  <div className="text-sm text-gray-600">Довольных игроков</div>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="space-y-4">
+              <h4 className="font-medium">Отчёт за текущую неделю</h4>
+              <div className="border rounded-lg p-4 space-y-2">
+                <p className="text-sm">
+                  <strong>Период:</strong> 01.07.2025 - 07.07.2025
+                </p>
+                <p className="text-sm">
+                  <strong>Самый популярный ивент:</strong> Гонки на выживание
+                  (45 участников)
+                </p>
+                <p className="text-sm">
+                  <strong>Проблемы:</strong> Лаги на сервере во время массовых
+                  ивентов
+                </p>
+                <p className="text-sm">
+                  <strong>Рекомендации:</strong> Увеличить мощность сервера,
+                  добавить новые виды наград
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      case "ГМП":
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card className="border-red-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Icon
+                      name="AlertTriangle"
+                      size={20}
+                      className="text-red-500"
+                    />
+                    <h4 className="font-medium text-red-700">
+                      Активные наказания
+                    </h4>
+                  </div>
+                  <div className="text-2xl font-bold text-red-600">7</div>
+                  <div className="text-sm text-gray-600">Игроков в бане</div>
+                </CardContent>
+              </Card>
+              <Card className="border-yellow-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Icon name="Clock" size={20} className="text-yellow-500" />
+                    <h4 className="font-medium text-yellow-700">
+                      Временные меры
+                    </h4>
+                  </div>
+                  <div className="text-2xl font-bold text-yellow-600">12</div>
+                  <div className="text-sm text-gray-600">Предупреждений</div>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h4 className="font-medium">Типы наказаний</h4>
+                <Button size="sm" variant="destructive">
+                  <Icon name="UserX" size={16} className="mr-2" />
+                  Выдать наказание
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="border rounded-lg p-3">
+                  <h5 className="font-medium mb-2">Предупреждение</h5>
+                  <p className="text-sm text-gray-600">
+                    За мелкие нарушения правил
+                  </p>
+                </div>
+                <div className="border rounded-lg p-3">
+                  <h5 className="font-medium mb-2">Кик</h5>
+                  <p className="text-sm text-gray-600">
+                    Исключение из текущего ивента
+                  </p>
+                </div>
+                <div className="border rounded-lg p-3">
+                  <h5 className="font-medium mb-2">Временный бан</h5>
+                  <p className="text-sm text-gray-600">От 1 часа до 7 дней</p>
+                </div>
+                <div className="border rounded-lg p-3">
+                  <h5 className="font-medium mb-2">Постоянный бан</h5>
+                  <p className="text-sm text-gray-600">
+                    За серьёзные нарушения
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case "Статистика":
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-2xl font-bold text-blue-600">47</div>
+                  <div className="text-sm text-gray-600">Всего ивентов</div>
+                  <div className="text-xs text-green-600">+12% за месяц</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-2xl font-bold text-green-600">1,234</div>
+                  <div className="text-sm text-gray-600">Участников</div>
+                  <div className="text-xs text-green-600">+23% за месяц</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-2xl font-bold text-purple-600">92%</div>
+                  <div className="text-sm text-gray-600">Завершаемость</div>
+                  <div className="text-xs text-green-600">+5% за месяц</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-2xl font-bold text-orange-600">4.7</div>
+                  <div className="text-sm text-gray-600">Средняя оценка</div>
+                  <div className="text-xs text-green-600">+0.3 за месяц</div>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="space-y-4">
+              <h4 className="font-medium">Популярные типы ивентов</h4>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Гонки</span>
+                  <div className="flex items-center space-x-2">
+                    <Progress value={75} className="w-32" />
+                    <span className="text-sm">75%</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Захват территории</span>
+                  <div className="flex items-center space-x-2">
+                    <Progress value={60} className="w-32" />
+                    <span className="text-sm">60%</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Дуэли</span>
+                  <div className="flex items-center space-x-2">
+                    <Progress value={45} className="w-32" />
+                    <span className="text-sm">45%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case "Оружие, скины и авто":
+        return (
+          <Tabs defaultValue="weapons" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="weapons">Оружие</TabsTrigger>
+              <TabsTrigger value="skins">Скины</TabsTrigger>
+              <TabsTrigger value="vehicles">Транспорт</TabsTrigger>
+            </TabsList>
+            <TabsContent value="weapons" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-3">
+                      <Icon name="Target" size={24} className="text-red-500" />
+                      <div>
+                        <h5 className="font-medium">AK-47</h5>
+                        <p className="text-sm text-gray-600">
+                          Награда за 1 место
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-3">
+                      <Icon
+                        name="Crosshair"
+                        size={24}
+                        className="text-blue-500"
+                      />
+                      <div>
+                        <h5 className="font-medium">Desert Eagle</h5>
+                        <p className="text-sm text-gray-600">
+                          Награда за 2 место
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+            <TabsContent value="skins" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="aspect-square bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg mb-3"></div>
+                    <h5 className="font-medium">Элитный костюм</h5>
+                    <p className="text-sm text-gray-600">Редкая награда</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="aspect-square bg-gradient-to-br from-blue-400 to-cyan-400 rounded-lg mb-3"></div>
+                    <h5 className="font-medium">Военная форма</h5>
+                    <p className="text-sm text-gray-600">За участие в ивенте</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="aspect-square bg-gradient-to-br from-green-400 to-yellow-400 rounded-lg mb-3"></div>
+                    <h5 className="font-medium">Гоночный комбинезон</h5>
+                    <p className="text-sm text-gray-600">Для гонщиков</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+            <TabsContent value="vehicles" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-3">
+                      <Icon name="Car" size={24} className="text-red-500" />
+                      <div>
+                        <h5 className="font-medium">Bugatti Chiron</h5>
+                        <p className="text-sm text-gray-600">
+                          Главный приз месяца
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-3">
+                      <Icon name="Bike" size={24} className="text-blue-500" />
+                      <div>
+                        <h5 className="font-medium">Harley Davidson</h5>
+                        <p className="text-sm text-gray-600">
+                          Приз за активность
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
+        );
+      case "Настройки":
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Основные настройки</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="server">Сервер</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Выберите сервер" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="server1">RMRP Server #1</SelectItem>
+                        <SelectItem value="server2">RMRP Server #2</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="timezone">Часовой пояс</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="UTC+3" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="utc+3">UTC+3 (Москва)</SelectItem>
+                        <SelectItem value="utc+0">UTC+0 (GMT)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Уведомления</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="notifications">
+                      Уведомления о новых ивентах
+                    </Label>
+                    <Button variant="outline" size="sm">
+                      Включено
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="reports">Напоминания об отчётах</Label>
+                    <Button variant="outline" size="sm">
+                      Включено
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="discord">Интеграция с Discord</Label>
+                    <Button variant="outline" size="sm">
+                      Настроить
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        );
+      default:
+        return <div>Раздел в разработке...</div>;
+    }
+  };
+
+  const createEventForm = () => (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="eventName">Название ивента</Label>
+        <Input
+          id="eventName"
+          placeholder="Например: Гонки на выживание"
+          value={eventForm.name}
+          onChange={(e) => setEventForm({ ...eventForm, name: e.target.value })}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="eventType">Тип ивента</Label>
+        <Select
+          value={eventForm.type}
+          onValueChange={(value) => setEventForm({ ...eventForm, type: value })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Выберите тип" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="race">Гонки</SelectItem>
+            <SelectItem value="pvp">PvP сражения</SelectItem>
+            <SelectItem value="capture">Захват территории</SelectItem>
+            <SelectItem value="survival">Выживание</SelectItem>
+            <SelectItem value="roleplay">Ролевые ивенты</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="eventDescription">Описание</Label>
+        <Textarea
+          id="eventDescription"
+          placeholder="Опишите правила и условия ивента..."
+          value={eventForm.description}
+          onChange={(e) =>
+            setEventForm({ ...eventForm, description: e.target.value })
+          }
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="participants">Максимум участников</Label>
+          <Input
+            id="participants"
+            type="number"
+            placeholder="20"
+            value={eventForm.participants}
+            onChange={(e) =>
+              setEventForm({ ...eventForm, participants: e.target.value })
+            }
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="rewards">Награды</Label>
+          <Input
+            id="rewards"
+            placeholder="100000$, оружие, авто"
+            value={eventForm.rewards}
+            onChange={(e) =>
+              setEventForm({ ...eventForm, rewards: e.target.value })
+            }
+          />
+        </div>
+      </div>
+      <div className="flex justify-end space-x-2">
+        <Button variant="outline">Сохранить как шаблон</Button>
+        <Button>Создать ивент</Button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -178,25 +798,43 @@ const Index = () => {
         {/* Navigation Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {navigationCards.map((card, index) => (
-            <Card
-              key={index}
-              className="hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-105"
-            >
-              <CardHeader className="pb-3">
-                <div className="flex items-center space-x-3">
-                  <div className={`p-2 rounded-lg ${card.color}`}>
-                    <Icon name={card.icon} size={24} className="text-white" />
-                  </div>
-                  <CardTitle className="text-lg">{card.title}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 text-sm mb-4">{card.description}</p>
-                <Button variant="outline" size="sm" className="w-full">
-                  Открыть
-                </Button>
-              </CardContent>
-            </Card>
+            <Dialog key={index}>
+              <DialogTrigger asChild>
+                <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-105">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center space-x-3">
+                      <div className={`p-2 rounded-lg ${card.color}`}>
+                        <Icon
+                          name={card.icon}
+                          size={24}
+                          className="text-white"
+                        />
+                      </div>
+                      <CardTitle className="text-lg">{card.title}</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600 text-sm mb-4">
+                      {card.description}
+                    </p>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Открыть
+                    </Button>
+                  </CardContent>
+                </Card>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center space-x-2">
+                    <div className={`p-2 rounded-lg ${card.color}`}>
+                      <Icon name={card.icon} size={20} className="text-white" />
+                    </div>
+                    <span>{card.title}</span>
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="mt-4">{renderSectionContent(card.title)}</div>
+              </DialogContent>
+            </Dialog>
           ))}
         </div>
 
@@ -239,22 +877,103 @@ const Index = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button className="w-full justify-start bg-blue-600 hover:bg-blue-700">
-                <Icon name="Plus" size={16} className="mr-2" />
-                Создать новый ивент
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Icon name="FileText" size={16} className="mr-2" />
-                Сформировать отчёт
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Icon name="Users" size={16} className="mr-2" />
-                Управление составом
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Icon name="BarChart3" size={16} className="mr-2" />
-                Просмотреть статистику
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="w-full justify-start bg-blue-600 hover:bg-blue-700">
+                    <Icon name="Plus" size={16} className="mr-2" />
+                    Создать новый ивент
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center space-x-2">
+                      <Icon name="Plus" size={20} className="text-blue-600" />
+                      <span>Создать новый ивент</span>
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-4">{createEventForm()}</div>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Icon name="FileText" size={16} className="mr-2" />
+                    Сформировать отчёт
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Генерация отчёта</DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-4 space-y-4">
+                    <div className="space-y-2">
+                      <Label>Период отчёта</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Выберите период" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="week">За неделю</SelectItem>
+                          <SelectItem value="month">За месяц</SelectItem>
+                          <SelectItem value="custom">Настраиваемый</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Тип отчёта</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Выберите тип" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="events">По ивентам</SelectItem>
+                          <SelectItem value="admins">
+                            По администраторам
+                          </SelectItem>
+                          <SelectItem value="full">Полный отчёт</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex justify-end space-x-2">
+                      <Button variant="outline">Предпросмотр</Button>
+                      <Button>Сгенерировать</Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Icon name="Users" size={16} className="mr-2" />
+                    Управление составом
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl">
+                  <DialogHeader>
+                    <DialogTitle>Управление составом</DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-4">{renderSectionContent("Состав")}</div>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Icon name="BarChart3" size={16} className="mr-2" />
+                    Просмотреть статистику
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl">
+                  <DialogHeader>
+                    <DialogTitle>Статистика</DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-4">
+                    {renderSectionContent("Статистика")}
+                  </div>
+                </DialogContent>
+              </Dialog>
             </CardContent>
           </Card>
         </div>
